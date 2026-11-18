@@ -1,6 +1,6 @@
 # Мозг агента (Python)
 
-`brain.py` загружает библиотеку ядра через `ctypes`, описывает структуру `CoreInfo` и вызывает `core_get_info`. При запуске без параметров печатает событие `agent_started` в JSON.
+`brain.py` загружает библиотеку ядра через `ctypes`, описывает структуру `CoreInfo` и вызывает `core_get_info`. При запуске без параметров печатает событие `agent_started` в JSON, включая `uptime_s` — секунды с запуска системы. Размер структуры C/Python должен быть 280 байт.
 
 На macOS из корня репозитория:
 
@@ -9,7 +9,7 @@ clang -Wall -Wextra -shared -fPIC -o agent/core/libsentry_core.dylib agent/core/
 python3 agent/brain/brain.py
 ```
 
-Для отправки JSON в опубликованный вебхук n8n передайте его URL аргументом:
+Сверьте `uptime_s` с командой `uptime` в macOS. Для отправки JSON в опубликованный вебхук n8n передайте его URL аргументом:
 
 ```sh
 python3 agent/brain/brain.py http://localhost:5678/webhook/agent
