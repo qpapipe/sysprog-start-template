@@ -1,8 +1,17 @@
 # Ядро агента (C)
 
-Ядро собирается в динамическую библиотеку: `sentry_core.dll` в Windows, `libsentry_core.dylib` в macOS,
-`libsentry_core.so` в Linux. Первая функция появляется на паре 2. Какие файлы и в какой главе появляются здесь — в [`agent/README.md`](../README.md).
+Первая функция ядра — `core_get_info`. Она заполняет `core_info` сведениями о системе и возвращает код ошибки.
 
-| Файл | Что в нём |
-|---|---|
-| — | пока пусто |
+- `core.h` — описание структуры и функции.
+- `core_info.c` — реализация для macOS/Linux и Windows.
+- `show_info.c` — небольшая программа для ручного вызова ядра.
+
+На macOS проверьте ядро и соберите библиотеку:
+
+```sh
+clang -Wall -Wextra -o show_info show_info.c core_info.c && ./show_info
+clang -Wall -Wextra -shared -fPIC -o libsentry_core.dylib core_info.c
+nm -gU libsentry_core.dylib
+```
+
+Собранная библиотека не коммитится: она создаётся из исходников на компьютере пользователя.
