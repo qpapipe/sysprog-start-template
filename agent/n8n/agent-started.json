@@ -1,0 +1,115 @@
+{
+  "name": "Agent started — Ollama",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "agent-started",
+        "responseMode": "onReceived",
+        "options": {}
+      },
+      "id": "54cfe9ac-1f2d-4e2f-9238-922355e6fc47",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -560,
+        0
+      ],
+      "webhookId": "agent-started"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "Ты — помощник по системному программированию. Кратко, по-русски, объясни событие от агента (2–3 предложения): что произошло и требуется ли действие.\n\nСобытие JSON:\n{{ JSON.stringify($json.body) }}",
+        "messages": {
+          "messageValues": []
+        },
+        "batchSize": 1
+      },
+      "id": "be04bbda-b8ed-446d-a34e-b274f2f61b54",
+      "name": "Basic LLM Chain",
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.5,
+      "position": [
+        -280,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "model": "qwen2.5:3b",
+        "options": {}
+      },
+      "id": "26396f2a-1e93-4d28-90b3-a0ab4189baca",
+      "name": "Ollama Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOllama",
+      "typeVersion": 1,
+      "position": [
+        -280,
+        220
+      ]
+    },
+    {
+      "parameters": {
+        "fromEmail": "agent@sysprog.local",
+        "toEmail": "student@sysprog.local",
+        "subject": "Агент: {{ $json.body.event || 'событие' }}",
+        "emailFormat": "text",
+        "text": "Событие агента:\n{{ JSON.stringify($json.body, null, 2) }}\n\nАнализ Ollama:\n{{ $json.text || $json.response || $json.output }}",
+        "options": {}
+      },
+      "id": "a4f8429a-e1c3-4e16-97e2-c5beea653f1d",
+      "name": "Send Email",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [
+        20,
+        0
+      ]
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Basic LLM Chain": {
+      "main": [
+        [
+          {
+            "node": "Send Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ollama Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "6b4ef018-741f-4098-ab8f-845275de7841",
+  "meta": {},
+  "tags": []
+}
