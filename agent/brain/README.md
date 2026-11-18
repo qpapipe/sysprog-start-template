@@ -9,10 +9,10 @@ clang -Wall -Wextra -shared -fPIC -o agent/core/libsentry_core.dylib agent/core/
 python3 agent/brain/brain.py
 ```
 
-Для отправки JSON в вебхук n8n передайте его URL аргументом:
+Для отправки JSON в опубликованный вебхук n8n передайте его URL аргументом:
 
 ```sh
-python3 agent/brain/brain.py http://localhost:5678/webhook-test/agent
+python3 agent/brain/brain.py http://localhost:5678/webhook/agent
 ```
 
 Сценарий n8n хранится в `agent/n8n/agent-started.json`; данные подключений и секреты в репозиторий не добавляются.
