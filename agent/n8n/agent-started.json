@@ -5,15 +5,14 @@
       "parameters": {
         "httpMethod": "POST",
         "path": "agent-started",
-        "responseMode": "onReceived",
         "options": {}
       },
-      "id": "54cfe9ac-1f2d-4e2f-9238-922355e6fc47",
+      "id": "4bc35587-ae93-49ed-932e-640b56c211b3",
       "name": "Webhook",
       "type": "n8n-nodes-base.webhook",
       "typeVersion": 2.1,
       "position": [
-        -560,
+        0,
         0
       ],
       "webhookId": "agent-started"
@@ -21,18 +20,17 @@
     {
       "parameters": {
         "promptType": "define",
-        "text": "Ты — помощник по системному программированию. Кратко, по-русски, объясни событие от агента (2–3 предложения): что произошло и требуется ли действие.\n\nСобытие JSON:\n{{ JSON.stringify($json.body) }}",
+        "text": "=Ты — помощник по системному программированию. Кратко, по-русски, объясни событие от агента (2–3 предложения): что произошло и требуется ли действие.\n\nСобытие JSON:\n{{ JSON.stringify($json.body) }}",
         "messages": {
           "messageValues": []
-        },
-        "batchSize": 1
+        }
       },
-      "id": "be04bbda-b8ed-446d-a34e-b274f2f61b54",
+      "id": "0fe3170a-cbd7-4c11-a6f0-828404af27c3",
       "name": "Basic LLM Chain",
       "type": "@n8n/n8n-nodes-langchain.chainLlm",
       "typeVersion": 1.5,
       "position": [
-        -280,
+        288,
         0
       ]
     },
@@ -41,34 +39,36 @@
         "model": "qwen2.5:3b",
         "options": {}
       },
-      "id": "26396f2a-1e93-4d28-90b3-a0ab4189baca",
+      "id": "73fc23e2-5477-4c85-af2f-fd700011fa0b",
       "name": "Ollama Chat Model",
       "type": "@n8n/n8n-nodes-langchain.lmChatOllama",
       "typeVersion": 1,
       "position": [
-        -280,
-        220
+        288,
+        224
       ]
     },
     {
       "parameters": {
         "fromEmail": "agent@sysprog.local",
         "toEmail": "student@sysprog.local",
-        "subject": "Агент: {{ $json.body.event || 'событие' }}",
+        "subject": "=Агент: {{ $node[\"Webhook\"].json.body.event || 'событие' }}",
         "emailFormat": "text",
-        "text": "Событие агента:\n{{ JSON.stringify($json.body, null, 2) }}\n\nАнализ Ollama:\n{{ $json.text || $json.response || $json.output }}",
+        "text": "=Событие агента:\n{{ JSON.stringify($node[\"Webhook\"].json.body, null, 2) }}\n\nАнализ Ollama:\n{{ $json.text || $json.response || $json.output }}",
         "options": {}
       },
-      "id": "a4f8429a-e1c3-4e16-97e2-c5beea653f1d",
+      "id": "8aedbc5f-0b38-47e4-ab3b-bc0eac7f6ade",
       "name": "Send Email",
       "type": "n8n-nodes-base.emailSend",
       "typeVersion": 2.1,
       "position": [
-        20,
+        592,
         0
-      ]
+      ],
+      "webhookId": "b6a00a62-992e-4571-b20f-1b1a51dc9ef0"
     }
   ],
+  "pinData": {},
   "connections": {
     "Webhook": {
       "main": [
@@ -104,12 +104,14 @@
       ]
     }
   },
-  "pinData": {},
   "active": false,
   "settings": {
-    "executionOrder": "v1"
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
   },
-  "versionId": "6b4ef018-741f-4098-ab8f-845275de7841",
+  "versionId": "63f2e499-0ef7-4dcc-9e23-0f756beccb77",
   "meta": {},
+  "nodeGroups": [],
   "tags": []
 }
