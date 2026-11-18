@@ -16,6 +16,7 @@ int core_get_info(struct core_info *out) {
     out->pid = (int64_t)GetCurrentProcessId();
     out->cpus = (int32_t)si.dwNumberOfProcessors;
     out->page_size = (int32_t)si.dwPageSize;
+    out->uptime_s = (int64_t)(GetTickCount64() / 1000);
 
     if (!GetComputerNameW(wide_host, &host_len))
         return (int)GetLastError();
@@ -29,8 +30,17 @@ int core_get_info(struct core_info *out) {
 
 #else
 #include <errno.h>
+#include <stddef.h>
 #include <string.h>
+#include <time.h>
 #include <unistd.h>
+
+#ifdef __APPLE__
+#include <sys/sysctl.h>
+#include <sys/time.h>
+#elif defined(__linux__)
+#include <sys/sysinfo.h>
+#endif
 
 int core_get_info(struct core_info *out) {
     if (out == NULL)
@@ -52,6 +62,25 @@ int core_get_info(struct core_info *out) {
     if (gethostname(out->host, sizeof out->host) != 0)
         return errno;
     out->host[sizeof out->host - 1] = '\0';
+
+#ifdef __APPLE__
+    struct timeval boot_time;
+    size_t boot_time_size = sizeof boot_time;
+    if (sysctlbyname("kern.boottime", &boot_time, &boot_time_size, NULL, 0) != 0)
+        return errno;
+    time_t now = time(NULL);
+    if (now == (time_t)-1 || now < boot_time.tv_sec)
+        return errno ? errno : EINVAL;
+    out->uptime_s = (int64_t)(now - boot_time.tv_sec);
+#elif defined(__linux__)
+    struct sysinfo system_info;
+    if (sysinfo(&system_info) != 0)
+        return errno;
+    out->uptime_s = (int64_t)system_info.uptime;
+#else
+    return ENOTSUP;
+#endif
+
     return 0;
 }
 #endif
