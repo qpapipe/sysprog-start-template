@@ -4,7 +4,7 @@
     {
       "parameters": {
         "httpMethod": "POST",
-        "path": "agent-started",
+        "path": "agent",
         "options": {}
       },
       "id": "4bc35587-ae93-49ed-932e-640b56c211b3",
@@ -52,7 +52,7 @@
       "parameters": {
         "fromEmail": "agent@sysprog.local",
         "toEmail": "student@sysprog.local",
-        "subject": "=Агент: {{ $node[\"Webhook\"].json.body.event || 'событие' }}",
+        "subject": "=Агент-сторож: {{ $node[\"Webhook\"].json.body.event || \"событие\" }} на {{ $node[\"Webhook\"].json.body.host || \"компьютере\" }}",
         "emailFormat": "text",
         "text": "=Событие агента:\n{{ JSON.stringify($node[\"Webhook\"].json.body, null, 2) }}\n\nАнализ Ollama:\n{{ $json.text || $json.response || $json.output }}",
         "options": {}
